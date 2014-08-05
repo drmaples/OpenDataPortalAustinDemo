@@ -1,0 +1,21 @@
+{
+  "name": "OpenDataPortalAustinDemo",
+  "version": "0.0.1",
+  "description": "meow",
+  "homepage": "https://github.com/drmaples/OpenDataPortalAustinDemo",
+  "author": "",
+  "license": "BSD-2-Clause",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/drmaples/OpenDataPortalAustinDemo.git"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "browserify": "~5.9.1",
+    "gulp": "~3.8.7",
+    "gulp-webserver": "~0.4.0",
+    "gulp-webserver": "~0.4.0",
+    "vinyl-source-stream": "~0.1.1",
+    "leaflet": "~0.7.3"
+  }
+}
