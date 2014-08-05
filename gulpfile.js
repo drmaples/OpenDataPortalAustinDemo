@@ -28,4 +28,8 @@ gulp.task('serve', ['browserify-app'], function() {
     );
 });
 
-gulp.task('default', ['browserify-app', 'serve']);
+gulp.task('watch', function() {
+    gulp.watch('./js/**', ['browserify-app']);
+});
+
+gulp.task('default', ['browserify-app', 'serve', 'watch']);
