@@ -16,10 +16,29 @@
             height: 100%;
             width: 100%;
         }
+        #controls {
+            position: absolute;
+            z-index: 10;
+            top: 80px;
+            left: 10px;
+        }
+        #controls input {
+            display: block;
+        }
     </style>
 </head>
 <body>
     <div id="map"></div>
+    <div id="controls">
+        <div id="slider">
+            <label>Min Score</label>
+            <input id="min" type="range" value="40" min="40" max="100" step="5">
+            <label>Max Score</label>
+            <input id="max" type="range" value="60" min="40" max="100" step="5">
+            <label>Limit</label>
+            <input id="limit" type="range" value="3" min="1" max="15" step="1">
+        </div>
+    </div>
     <script src="./bundle.js"></script>
 </body>
 </html>
