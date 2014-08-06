@@ -17,7 +17,6 @@
     "vinyl-source-stream": "~0.1.1",
     "leaflet": "~0.7.3",
     "when": "~3.4.3",
-    "geolib": "~2.0.14",
-    "then-request": "~1.0.0"
+    "geolib": "~2.0.14"
   }
 }

@@ -1,6 +1,5 @@
 var L = require('leaflet');
 var when = require('when');
-var request = require('then-request');
 var geolib = require('geolib');
 var stops = require('./stops_801_1');
 
@@ -41,20 +40,24 @@ App.prototype = {
         }.bind(this));
 
         this.$min = document.getElementById('min');
+        this.$minDisp = document.getElementById('min-disp');
         this.$max = document.getElementById('max');
+        this.$maxDisp = document.getElementById('max-disp');
         this.$limit = document.getElementById('limit');
-        this.minScore = this.$min.value;
-        this.maxScore = this.$max.value;
-        this.limit = this.$limit.value;
+        this.$limitDisp = document.getElementById('limit-disp');
+        this.minScore = this.$minDisp.innerHTML = this.$min.value;
+        this.maxScore = this.$maxDisp.innerHTML = this.$max.value;
+        this.limit = this.$limitDisp.innerHTML = this.$limit.value;
 
         this.$min.onchange = function() {
-            this.minScore = this.$min.value;
+            console.log("IN HERE");
+            this.minScore = this.$minDisp.innerHTML = this.$min.value;
         }.bind(this);
         this.$max.onchange = function() {
-            this.maxScore = this.$max.value;
+            this.maxScore = this.$maxDisp.innerHTML = this.$max.value;
         }.bind(this);
         this.$limit.onchange = function() {
-            this.limit = this.$limit.value;
+            this.limit = this.$limitDisp.innerHTML = this.$limit.value;
         }.bind(this);
 
         var self = this;
