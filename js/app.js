@@ -42,20 +42,16 @@ App.prototype = {
 
         this.$min = document.getElementById('min');
         this.$minDisp = document.getElementById('min-disp');
-        this.$max = document.getElementById('max');
         this.$maxDisp = document.getElementById('max-disp');
         this.$limit = document.getElementById('limit');
         this.$limitDisp = document.getElementById('limit-disp');
         this.minScore = this.$minDisp.innerHTML = this.$min.value;
-        this.maxScore = this.$maxDisp.innerHTML = this.$max.value;
+        this.maxScore = this.$maxDisp.innerHTML = parseInt(this.minScore) + 5;
         this.limit = this.$limitDisp.innerHTML = this.$limit.value;
 
         this.$min.onchange = function() {
             this.minScore = this.$minDisp.innerHTML = this.$min.value;
-            this.resetRestarantData();
-        }.bind(this);
-        this.$max.onchange = function() {
-            this.maxScore = this.$maxDisp.innerHTML = this.$max.value;
+            this.maxScore = this.$maxDisp.innerHTML = parseInt(this.minScore) + 5;
             this.resetRestarantData();
         }.bind(this);
         this.$limit.onchange = function() {
