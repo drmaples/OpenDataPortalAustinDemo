@@ -8,8 +8,12 @@ function App() {
     this.map = null;
     this.latlng = null;
     this._restaurantData = null;
-    this.minScore = 30;
-    this.maxScore = 60;
+    this.minScore = null;
+    this.maxScore = null;
+    this.limit = null;
+    this.$min = null;
+    this.$max = null;
+    this.$limit = null;
 }
 
 App.prototype = {
@@ -35,6 +39,25 @@ App.prototype = {
                 .bindPopup('u r here?')
                 .openPopup();
         }.bind(this));
+
+        this.$min = document.getElementById('min');
+        this.$max = document.getElementById('max');
+        this.$limit = document.getElementById('limit');
+        this.minScore = this.$min.value;
+        this.maxScore = this.$max.value;
+        this.limit = this.$limit.value;
+
+        this.$min.onchange = function() {
+            this.minScore = this.$min.value;
+        }.bind(this);
+        this.$max.onchange = function() {
+            this.maxScore = this.$max.value;
+        }.bind(this);
+        this.$limit.onchange = function() {
+            this.limit = this.$limit.value;
+        }.bind(this);
+
+        var self = this;
 
         stops.forEach(function(s) {
             var options = {
@@ -65,8 +88,7 @@ App.prototype = {
                         return n;
                     });
 
-                    var closest = geolib.findNearest({latitude: lat, longitude: lng}, coordsData, 0, 3);
-
+                    var closest = geolib.findNearest({latitude: lat, longitude: lng}, coordsData, 0, self.limit);
 
                     closest.forEach(function(c) {
                         var inspectionData = data[Number(c.key)];
