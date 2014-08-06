@@ -21,6 +21,8 @@
             z-index: 10;
             top: 80px;
             left: 10px;
+            background-color: white;
+            padding: 5px;
         }
         #controls input {
             display: block;
@@ -31,11 +33,11 @@
     <div id="map"></div>
     <div id="controls">
         <div id="slider">
-            <label>Min Score</label>
+            <label>Min Score (<span id="min-disp">0</span>)</label>
             <input id="min" type="range" value="40" min="40" max="100" step="5">
-            <label>Max Score</label>
+            <label>Max Score (<span id="max-disp">0</span>)</label></span>
             <input id="max" type="range" value="60" min="40" max="100" step="5">
-            <label>Limit</label>
+            <label>Limit (<span id="limit-disp">0</span>)</label>
             <input id="limit" type="range" value="3" min="1" max="15" step="1">
         </div>
     </div>

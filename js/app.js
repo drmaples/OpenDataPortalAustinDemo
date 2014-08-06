@@ -1,6 +1,5 @@
 var L = require('leaflet');
 var when = require('when');
-var request = require('then-request');
 var geolib = require('geolib');
 var stops = require('./stops_801_1');
 
@@ -14,6 +13,7 @@ function App() {
     this.$min = null;
     this.$max = null;
     this.$limit = null;
+    this.currentMarkers = [];
 }
 
 App.prototype = {
@@ -41,20 +41,26 @@ App.prototype = {
         }.bind(this));
 
         this.$min = document.getElementById('min');
+        this.$minDisp = document.getElementById('min-disp');
         this.$max = document.getElementById('max');
+        this.$maxDisp = document.getElementById('max-disp');
         this.$limit = document.getElementById('limit');
-        this.minScore = this.$min.value;
-        this.maxScore = this.$max.value;
-        this.limit = this.$limit.value;
+        this.$limitDisp = document.getElementById('limit-disp');
+        this.minScore = this.$minDisp.innerHTML = this.$min.value;
+        this.maxScore = this.$maxDisp.innerHTML = this.$max.value;
+        this.limit = this.$limitDisp.innerHTML = this.$limit.value;
 
         this.$min.onchange = function() {
-            this.minScore = this.$min.value;
+            this.minScore = this.$minDisp.innerHTML = this.$min.value;
+            this.resetRestarantData();
         }.bind(this);
         this.$max.onchange = function() {
-            this.maxScore = this.$max.value;
+            this.maxScore = this.$maxDisp.innerHTML = this.$max.value;
+            this.resetRestarantData();
         }.bind(this);
         this.$limit.onchange = function() {
-            this.limit = this.$limit.value;
+            this.limit = this.$limitDisp.innerHTML = this.$limit.value;
+            this.resetRestarantData();
         }.bind(this);
 
         var self = this;
@@ -101,10 +107,19 @@ App.prototype = {
             marker.addTo(this.map);
         }.bind(this));
     },
+    resetRestarantData: function() {
+        this._restaurantData = null;
+    },
+    clearExistingMarkers: function() {
+        this.currentMarkers.forEach(function (m) {
+            this.map.removeLayer(m);
+        }.bind(this));
+    },
     restaurantData: function() {
         var deferred = when.defer(),
             promise = deferred.promise;
 
+        this.clearExistingMarkers();
         if (!this._restaurantData) {
             this.loadRestaurantData(this.minScore, this.maxScore)
                 .then(function(data) {
@@ -167,13 +182,13 @@ App.prototype = {
             radius: 12,
             zIndexOffset: 1
         };
-        console.log("drawRestaurant: inspectionData", inspectionData);
-        console.log("drawRestaurant: geoData", geoData);
         var marker = L.circleMarker([geoData.latitude, geoData.longitude], options);
 
         marker.addTo(this.map)
             .bindPopup(inspectionData.score + ' -- ' + inspectionData.restaurant_name)
             .openPopup();
+
+        this.currentMarkers.push(marker);
     }
 };
 
