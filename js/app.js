@@ -20,8 +20,6 @@ App.prototype = {
     start: function() {
         this.map = L.map('map').setView([30.267153, -97.743061], 12);
 
-        L.Icon.Default.imagePath = 'http://api.tiles.mapbox.com/mapbox.js/v1.0.0beta0.0/images';
-
         L.tileLayer('http://otile{s}.mqcdn.com/tiles/1.0.0/map/{z}/{x}/{y}.jpeg', {
             attribution: '<a href="http://www.mapquest.com/">Tiles</a> | <a href="http://openstreetmap.org">Map data</a>, <a href="http://creativecommons.org/licenses/by-sa/2.0/">contributors</a>',
             subdomains: '1234'
@@ -36,8 +34,7 @@ App.prototype = {
             this.latlng = e.latlng;
 
             L.circleMarker(this.latlng).addTo(this.map)
-                .bindPopup('u r here?')
-                .openPopup();
+                .bindPopup('u r here?');
         }.bind(this));
 
         this.$min = document.getElementById('min');
@@ -100,7 +97,7 @@ App.prototype = {
 
             });
 
-            marker.addTo(this.map);
+            marker.bindPopup(s.stop_name.replace('(NB)', '')).addTo(this.map);
         }.bind(this));
     },
     resetRestarantData: function() {
@@ -180,9 +177,16 @@ App.prototype = {
         };
         var marker = L.circleMarker([geoData.latitude, geoData.longitude], options);
 
+        var content = '<span class="score">' + inspectionData.score + '</span> ' + '<b>' + inspectionData.restaurant_name + '</b>';
+        content += '<br />';
+        content += inspectionData.process_description;
+        content += '<br /><br />';
+        var human_address = JSON.parse(inspectionData.address.human_address);
+        content += '<i>' + human_address.address + '<br />' + human_address.city + ' ' + human_address.state + ', ' + human_address.zip + '</i>';
+        console.log(inspectionData);
+
         marker.addTo(this.map)
-            .bindPopup(inspectionData.score + ' -- ' + inspectionData.restaurant_name)
-            .openPopup();
+            .bindPopup(content);
 
         this.currentMarkers.push(marker);
     }

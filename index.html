@@ -9,7 +9,9 @@
             width: 100%;
             padding: 0;
             margin: 0;
-            font-family:"Comic Sans MS", cursive, sans-serif
+        }
+        * {
+            font-family: "Comic Sans MS", cursive, sans-serif !important;
         }
         #map {
             position: absolute;
@@ -30,6 +32,19 @@
         }
         #controls input {
             display: block;
+        }
+        .leaflet-popup-content b {
+            font-size: 1.3em;
+        }
+        .score {
+            padding: 0.5em;
+            font-size: 2em;
+            height: 1em;
+            width: 1em;
+            display: block;
+            background-color: #FF9933;
+            border-radius: 1em;
+            font-weight: bold;
         }
     </style>
 </head>
