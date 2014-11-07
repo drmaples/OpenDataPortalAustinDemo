@@ -27,168 +27,54 @@ App.prototype = {
             subdomains: '1234'
         }).addTo(this.map);
 
-        this.map.locate();
+        this.loadRestaurantData()
+            .then(this.drawRestaurant.bind(this));
 
-        this.map.on('locationfound', function(e) {
-            if (!this.latlng) {
-                this.latlng = [30.267153, -97.743061];
-            }
-            this.latlng = e.latlng;
+    },
+    loadRestaurantData: function(minScore, maxScore) {
+        var deferred = when.defer();
 
-            L.circleMarker(this.latlng).addTo(this.map)
-                .bindPopup('u r here?')
-                .openPopup();
-        }.bind(this));
+            window.Keen.configure({
+                projectId: "5421803333e406113085ef70",
+                readKey: "34ff00b8e5cb7a485899b2c8edcc494f3dde2cb0f14c526a94aa5113c7678577210432d216e53f9b083fef49ff0e7e20cdacf6cc6ae62faaa96989a9190711aa02157f0d8d854c24039cee080622d3652337b68c4ba3e1793bf6ce2a6a851f9e859ca0c5664c4dacabe0eb3fd4d8fa53"
+            });
 
-        this.$min = document.getElementById('min');
-        this.$minDisp = document.getElementById('min-disp');
-        this.$max = document.getElementById('max');
-        this.$maxDisp = document.getElementById('max-disp');
-        this.$limit = document.getElementById('limit');
-        this.$limitDisp = document.getElementById('limit-disp');
-        this.minScore = this.$minDisp.innerHTML = this.$min.value;
-        this.maxScore = this.$maxDisp.innerHTML = this.$max.value;
-        this.limit = this.$limitDisp.innerHTML = this.$limit.value;
+        window.Keen.onChartsReady(function() {
 
-        this.$min.onchange = function() {
-            this.minScore = this.$minDisp.innerHTML = this.$min.value;
-            this.resetRestarantData();
-        }.bind(this);
-        this.$max.onchange = function() {
-            this.maxScore = this.$maxDisp.innerHTML = this.$max.value;
-            this.resetRestarantData();
-        }.bind(this);
-        this.$limit.onchange = function() {
-            this.limit = this.$limitDisp.innerHTML = this.$limit.value;
-            this.resetRestarantData();
-        }.bind(this);
+            var unique = new window.Keen.Metric("TripSelected", {
+                analysisType: "select_unique",
+                targetProperty: "coordinates"
+            });
 
-        var self = this;
+            unique.getResponse(function(response) {
+                console.log(response);
+                response.result = response.result.filter(function(c) {
+                    return !!c && !!c.length && !!c[0] && !!c[1];
+                });
+                console.table(response.result);
 
-        stops.forEach(function(s) {
+                deferred.resolve(response.result);
+            });
+        });
+
+        return deferred.promise;
+    },
+    drawRestaurant: function(coords) {
+        coords.forEach(function(coord) {
             var options = {
                 color: 'white',
                 opacity: 1,
                 weight: 3,
-                fillColor: 'red',
+                fillColor: 'blue',
                 fill: true,
-                fillOpacity: 1,
+                fillOpacity: 0.3,
                 radius: 12,
                 zIndexOffset: 1
             };
-
-            var marker = L.circleMarker([s.stop_lat, s.stop_lon], options);
-
-            var restaurantDataGetter = this.restaurantData.bind(this),
-                drawRestaurant = this.drawRestaurant.bind(this);
-
-            marker.on('click', function() {
-                var lat = this._latlng.lat;
-                var lng = this._latlng.lng;
-
-                restaurantDataGetter().then(function(data) {
-                    var coordsData = data.map(function(n) {
-                        n.latitude = n.address.latitude;
-                        n.longitude = n.address.longitude;
-
-                        return n;
-                    });
-
-                    var closest = geolib.findNearest({latitude: lat, longitude: lng}, coordsData, 0, self.limit);
-
-                    closest.forEach(function(c) {
-                        var inspectionData = data[Number(c.key)];
-                        drawRestaurant(inspectionData, c);
-                    });
-                });
-
-            });
+            var marker = L.circleMarker([coord[0], coord[1]], options);
 
             marker.addTo(this.map);
         }.bind(this));
-    },
-    resetRestarantData: function() {
-        this._restaurantData = null;
-    },
-    clearExistingMarkers: function() {
-        this.currentMarkers.forEach(function (m) {
-            this.map.removeLayer(m);
-        }.bind(this));
-    },
-    restaurantData: function() {
-        var deferred = when.defer(),
-            promise = deferred.promise;
-
-        this.clearExistingMarkers();
-        if (!this._restaurantData) {
-            this.loadRestaurantData(this.minScore, this.maxScore)
-                .then(function(data) {
-                    this._restaurantData = data;
-                    if (this._restaurantData.length === 0) {
-                        var msg = 'Zero restaurants with score between ' + this.minScore + ' and ' + this.maxScore;
-                        throw Error(msg);
-                    }
-
-                    deferred.resolve(this._restaurantData);
-                }.bind(this))
-                .catch(function(e) {
-                    console.error(e);
-                    alert(e);
-                    deferred.reject(e);
-                });
-        }
-        else {
-            deferred.resolve(this._restaurantData);
-        }
-
-        return promise;
-    },
-    loadRestaurantData: function(minScore, maxScore) {
-        var deferred = when.defer();
-        var r = new XMLHttpRequest();
-        var data = null;
-        var query = '$where=score > ' + minScore + ' AND score < ' + maxScore;
-
-        r.open('GET', 'http://data.austintexas.gov/resource/ecmv-9xxi.json?' + query, true);
-
-        r.onload = function() {
-            if (r.status >= 200 && r.status < 400) {
-                var data = JSON.parse(r.responseText);
-                deferred.resolve(data);
-            }
-            else {
-                console.error(r.status, r.responseText);
-                deferred.reject();
-            }
-        };
-
-        r.onerror = function(e) {
-            console.error(e);
-            deferred.reject();
-        };
-
-        r.send();
-
-        return deferred.promise;
-    },
-    drawRestaurant: function(inspectionData, geoData) {
-        var options = {
-            color: 'white',
-            opacity: 1,
-            weight: 3,
-            fillColor: 'blue',
-            fill: true,
-            fillOpacity: 1,
-            radius: 12,
-            zIndexOffset: 1
-        };
-        var marker = L.circleMarker([geoData.latitude, geoData.longitude], options);
-
-        marker.addTo(this.map)
-            .bindPopup(inspectionData.score + ' -- ' + inspectionData.restaurant_name)
-            .openPopup();
-
-        this.currentMarkers.push(marker);
     }
 };
 
